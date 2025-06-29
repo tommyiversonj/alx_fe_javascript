@@ -155,43 +155,42 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
-// ✅ Renamed to match expected function name
-async function fetchQuotesFromServer() {
+// === New syncQuotes function ===
+async function syncQuotes() {
   try {
     const response = await fetch(SERVER_URL);
     if (!response.ok) throw new Error('Fetch failed');
     const serverData = await response.json();
+
     const serverQuotes = serverData.slice(0, 10).map(item => ({
       text: item.title || item.body || "Untitled",
       category: "Server",
       timestamp: Date.now()
     }));
-    mergeQuotes(serverQuotes);
+
+    let updated = false;
+    serverQuotes.forEach(sq => {
+      const index = quotes.findIndex(q => q.text === sq.text);
+      if (index === -1) {
+        quotes.push(sq);
+        updated = true;
+      } else if (sq.timestamp > quotes[index].timestamp || sq.category !== quotes[index].category) {
+        quotes[index] = sq;
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      saveQuotes();
+      populateCategories();
+      filterQuotes();
+      notifyUser("Quotes updated from server.");
+    } else {
+      notifyUser("Quotes are up to date.");
+    }
   } catch (err) {
     console.error(err);
     notifyUser("Failed to sync with server.");
-  }
-}
-
-// Merge server quotes
-function mergeQuotes(serverQuotes) {
-  let updated = false;
-  serverQuotes.forEach(sq => {
-    const index = quotes.findIndex(q => q.text === sq.text);
-    if (index === -1) {
-      quotes.push(sq);
-      updated = true;
-    } else if (sq.timestamp > quotes[index].timestamp || sq.category !== quotes[index].category) {
-      quotes[index] = sq;
-      updated = true;
-    }
-  });
-
-  if (updated) {
-    saveQuotes();
-    populateCategories();
-    filterQuotes();
-    notifyUser("Quotes updated from server.");
   }
 }
 
@@ -216,11 +215,11 @@ async function postQuoteToServer(quote) {
 newQuoteBtn.addEventListener("click", showRandomQuote);
 exportBtn.addEventListener("click", exportQuotes);
 importFile.addEventListener("change", importFromJsonFile);
-syncNowBtn.addEventListener("click", fetchQuotesFromServer);
+syncNowBtn.addEventListener("click", syncQuotes);
 
 // Initialization
 loadLastViewedQuote();
 populateCategories();
 createAddQuoteForm();
 filterQuotes();
-setInterval(fetchQuotesFromServer, 60000); // auto sync every 1 min
+setInterval(syncQuotes, 60000); // Periodic sync every 1 minute
