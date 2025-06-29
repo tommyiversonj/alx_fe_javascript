@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Quote Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        #quoteDisplay {
+            margin: 20px 0;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        input {
+            margin: 5px;
+        }
+
+        #notification {
+            background-color: #e0ffe0;
+            border: 1px solid #0a0;
+            padding: 10px;
+            margin: 10px 0;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Dynamic Quote Generator</h1>
+
+    <!-- Category Filter -->
+    <h2>Filter by Category</h2>
+    <select id="categoryFilter" onchange="filterQuotes()">
+        <option value="all">All Categories</option>
+    </select>
+
+    <!-- Quote Display -->
+    <div id="quoteDisplay">Click the button to display a quote</div>
+    <button id="newQuote">Show New Quote</button>
+
+    <!-- Add New Quote -->
+    <h2>Add a New Quote</h2>
+    <div>
+        <input id="newQuoteText" type="text" placeholder="Enter a new quote" />
+        <input id="newQuoteCategory" type="text" placeholder="Enter quote category" />
+        <button id="addQuoteBtn">Add Quote</button>
+    </div>
+
+    <!-- Import/Export -->
+    <h2>Import/Export Quotes</h2>
+    <div>
+        <button id="exportBtn">Export Quotes as JSON</button>
+        <input type="file" id="importFile" accept=".json" />
+    </div>
+
+    <!-- Manual Sync Button -->
+    <h2>Sync with Server</h2>
+    <button id="syncNowBtn">Sync Now</button>
+
+    <!-- Notification Area -->
+    <div id="notification"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
